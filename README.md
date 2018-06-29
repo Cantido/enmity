@@ -19,3 +19,9 @@ Documentation can be found at [https://hexdocs.pm/enmity](https://hexdocs.pm/enm
 ## Usage
 
 Who knows? We haven't written it yet.
+
+## License
+
+Copyright © 2017 Rosa Richter (formerly Robert Richter)
+
+Licensed under the MIT License.
