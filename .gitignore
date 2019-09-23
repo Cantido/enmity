@@ -22,3 +22,5 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 enmity-*.tar
 
+# Ignore secrets (stuff like auth tokens) used for integration tests.
+config/integration.secret.exs

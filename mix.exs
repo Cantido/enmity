@@ -10,9 +10,13 @@ defmodule Enmity.MixProject do
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
-      source_url: "https://github.com/Cantido/enmity"
+      source_url: "https://github.com/Cantido/enmity",
+      test_paths: test_paths(Mix.env())
     ]
   end
+
+  defp test_paths(:integration), do: ["test/integration"]
+  defp test_paths(_), do: ["test/unit"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do
@@ -23,6 +27,8 @@ defmodule Enmity.MixProject do
 
   defp deps do
     [
+      {:httpoison, "~> 1.5"},
+      {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
