@@ -8,7 +8,7 @@ defmodule Enmity do
 
   ## Examples
 
-      iex> Enmity.hello
+      iex> Enmity.hello()
       :world
 
   """
