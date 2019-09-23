@@ -4,7 +4,7 @@ defmodule Enmity.MixProject do
   def project do
     [
       app: :enmity,
-      version: "0.1.0",
+      version: "0.2.0",
       description: "A Discord library.",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
