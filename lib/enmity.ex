@@ -7,13 +7,16 @@ defmodule Enmity do
   Gets a user.
   """
   def user(user_id, [token: token]) do
-    url = "https://discordapp.com/api/users/#{user_id}"
-    headers = ["Authorization": "Bot #{token}", "Accept": "Application/json; Charset=utf-8"]
-    options = [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 1_000]
+    url = "/users/#{user_id}"
+    headers = ["Authorization": "Bot #{token}"]
 
-    case HTTPoison.get(url, headers, options) do
+    Enmity.HTTP.get(url, headers) |> make_response_nicer()
+  end
+
+  defp make_response_nicer(response) do
+    case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, Poison.decode!(body)}
+        {:ok, body}
       {:ok, %HTTPoison.Response{status_code: code, body: body}} ->
         {:error, [status_code: code, reason: body]}
       {:error, %HTTPoison.Error{reason: reason}} ->
