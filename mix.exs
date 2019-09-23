@@ -29,7 +29,7 @@ defmodule Enmity.MixProject do
     [
       {:httpoison, "~> 1.5"},
       {:poison, "~> 3.1"},
-      {:ex_doc, "~> 0.14", only: :dev}
+      {:ex_doc, "~> 0.21", only: :dev}
     ]
   end
 
