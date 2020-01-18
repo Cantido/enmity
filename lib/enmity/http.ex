@@ -2,7 +2,7 @@ defmodule Enmity.HTTP do
   use HTTPoison.Base
 
   @expected_fields ~w(
-    avatar bot discriminator email flags id locale mfa_enabled username verified
+    avatar bot discriminator email flags id locale mfa_enabled username verified premium_type system
   )
 
   @doc """
