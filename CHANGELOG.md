@@ -6,11 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.3] - 2014-08-09
+## [0.3.0] - 2020-01-19
 ### Added
 - This changelog
 - This library can now connect to the Discord Gateway for real-time events
 - Added the rest of the missing User API
 
-[Unreleased]: https://github.com/cantido/enmity/compare/v0.0.3...HEAD
-[0.0.3]: https://github.com/cantido/enmity/compare/v0.0.1...v0.0.3
+[Unreleased]: https://github.com/cantido/enmity/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/cantido/enmity/compare/v0.1.0...v0.3.0

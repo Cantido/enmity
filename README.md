@@ -9,7 +9,7 @@ The package can be installed by adding `enmity` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:enmity, "~> 0.1.0"}
+    {:enmity, "~> 0.3.0"}
   ]
 end
 ```
