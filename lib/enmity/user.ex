@@ -65,4 +65,8 @@ defmodule Enmity.User do
   def my_guilds do
     HTTP.get("/users/@me/guilds") |> HTTP.make_response_nicer()
   end
+
+  def leave_guild(guild_id) do
+    HTTP.delete("/users/@me/guilds/#{guild_id}") |> HTTP.make_response_nicer()
+  end
 end
