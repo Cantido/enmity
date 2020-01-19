@@ -44,7 +44,6 @@ defmodule Enmity.HTTP do
     options ++ [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 1_000]
   end
 
-#  "{\"username\": \"testbot\", \"verified\": true, \"locale\": \"en-US\", \"mfa_enabled\": true, \"bot\": true, \"id\": \"625487844994973716\", \"flags\": 0, \"avatar\": null, \"discriminator\": \"4646\", \"email\": null}"
   @doc """
   Processes a Discord API response body.
 
