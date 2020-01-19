@@ -35,4 +35,10 @@ defmodule Enmity.UserTest do
       permissions: 104324673
     ]]
   end
+
+  test "get connections" do
+    {:ok, connections} = Enmity.User.my_connections()
+
+    assert connections == []
+  end
 end

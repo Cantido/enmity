@@ -69,4 +69,17 @@ defmodule Enmity.User do
   def leave_guild(guild_id) do
     HTTP.delete("/users/@me/guilds/#{guild_id}") |> HTTP.make_response_nicer()
   end
+
+  def create_dm(recipient_id) do
+    HTTP.post("/users/@me/channels", Poison.encode!(recipient_id)) |> HTTP.make_response_nicer()
+  end
+
+  def create_group_dm(tokens, nicks) when is_list(tokens) and is_map(nicks) do
+    HTTP.post("/users/@me/channels", Poison.encode!(%{tokens: tokens, nicks: nicks}))
+    |> HTTP.make_response_nicer()
+  end
+
+  def my_connections do
+    HTTP.get("/users/@me/connections") |> HTTP.make_response_nicer()
+  end
 end
