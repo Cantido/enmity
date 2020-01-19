@@ -2,6 +2,10 @@ defmodule Enmity.HTTP do
   use HTTPoison.Base
   require Logger
 
+  @moduledoc """
+  The `HTTPoison.Base` implementation for Discord's HTTP API.
+  """
+
   @user_fields ~w(
     avatar bot discriminator email flags id locale mfa_enabled username
     verified premium_type system
