@@ -18,10 +18,19 @@ Documentation can be found at [https://hexdocs.pm/enmity](https://hexdocs.pm/enm
 
 ## Usage
 
-Use the functions defined in the `Enmity` module.
+Place your bot's token into your config file.
 
 ```elixir
-{:ok, resp} = Enmity.user("625487844994973716", token: @token)
+import Config
+
+config :enmity,
+  token: "a big, fifty-nine-character string"
+```
+
+That's all you need to start making API calls.
+
+```elixir
+{:ok, resp} = Enmity.User.get("625487844994973716")
 
 assert resp == [
   avatar: nil,
@@ -36,13 +45,12 @@ assert resp == [
 
 Alongside the usual `mix test`, this library also has integration tests.
 To run integration tests, you must first create the file `config/integration.secret.exs`,
-where you define the `:token` given to you by Discord, like so:
+where you define the `:token` given to you by Discord.
 
-```elixir
-import Config
+Run the tests by setting the `MIX_ENV` to `integration`:
 
-config :enmity,
-  token: "a big, fifty-nine-character string"
+```bash
+MIX_ENV=integration mix test
 ```
 
 ## License
