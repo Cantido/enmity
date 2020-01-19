@@ -24,7 +24,7 @@ defmodule Enmity.HTTP do
   ## Examples
 
       iex> Enmity.HTTP.process_request_headers([])
-      ["Accept": "Application/json; Charset=utf-8"]
+      ["Authorization": "Bot A gigantic fifty-nine character string 12345678901234567890", "Accept": "Application/json; Charset=utf-8"]
 
   """
   def process_request_headers(headers) do
