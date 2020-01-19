@@ -4,6 +4,7 @@ defmodule Enmity.HTTP do
 
   @expected_fields ~w(
     avatar bot discriminator email flags id locale mfa_enabled username verified premium_type system
+    name icon owner permissions
   )
 
   @doc """
@@ -64,8 +65,17 @@ defmodule Enmity.HTTP do
   """
   def process_response_body(body) do
     Logger.debug("Response body: #{body}")
-    body
-    |> Poison.decode!
+    body = Poison.decode!(body)
+
+    if is_list(body) do
+      Enum.map(body, &sanitize_keys/1)
+    else
+      sanitize_keys(body)
+    end
+  end
+
+  defp sanitize_keys(map) when is_map(map) do
+    map
     |> Map.take(@expected_fields)
     |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
   end

@@ -61,4 +61,8 @@ defmodule Enmity.User do
       {type, _, _, _} -> {:error, [invalid_image_type: type]}
     end
   end
+
+  def my_guilds do
+    HTTP.get("/users/@me/guilds") |> HTTP.make_response_nicer()
+  end
 end

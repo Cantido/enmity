@@ -23,4 +23,17 @@ defmodule Enmity.UserTest do
 
     {:ok, _resp} = Enmity.User.modify_me(username: old_me[:username])
   end
+
+  test "gets guilds" do
+    {:ok, guilds} = Enmity.User.my_guilds()
+
+    assert guilds == [[
+      icon: nil,
+      id: "668217932211421234",
+      name: "Rosa's Lab",
+      owner: false,
+      permissions: 104324673
+    ]]
+
+  end
 end
