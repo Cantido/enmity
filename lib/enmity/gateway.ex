@@ -8,7 +8,7 @@ defmodule Enmity.Gateway do
         use Enmity.Gateway
 
         def handle_event(:READY, data, state) do
-          # We're connected! hoorday!
+          # We're connected! hooray!
           {:ok, state}
         end
 
