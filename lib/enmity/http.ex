@@ -1,5 +1,6 @@
 defmodule Enmity.HTTP do
   use HTTPoison.Base
+  require Logger
 
   @expected_fields ~w(
     avatar bot discriminator email flags id locale mfa_enabled username verified premium_type system
@@ -24,13 +25,17 @@ defmodule Enmity.HTTP do
   ## Examples
 
       iex> Enmity.HTTP.process_request_headers([])
-      ["Authorization": "Bot A gigantic fifty-nine character string 12345678901234567890", "Accept": "Application/json; Charset=utf-8"]
-
+      [
+        "Authorization": "Bot A gigantic fifty-nine character string 12345678901234567890",
+        "Accept": "Application/json; Charset=utf-8",
+        "Content-Type": "application/json"
+      ]
   """
   def process_request_headers(headers) do
     headers ++ [
       "Authorization": "Bot #{Application.fetch_env!(:enmity, :token)}",
-      "Accept": "Application/json; Charset=utf-8"
+      "Accept": "Application/json; Charset=utf-8",
+      "Content-Type": "application/json"
     ]
   end
 
@@ -47,6 +52,7 @@ defmodule Enmity.HTTP do
     options ++ [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 1_000]
   end
 
+
   @doc """
   Processes a Discord API response body.
 
@@ -57,6 +63,7 @@ defmodule Enmity.HTTP do
 
   """
   def process_response_body(body) do
+    Logger.debug("Response body: #{body}")
     body
     |> Poison.decode!
     |> Map.take(@expected_fields)

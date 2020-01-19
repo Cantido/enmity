@@ -13,4 +13,14 @@ defmodule Enmity.UserTest do
       username: "Rosa's Robot"
     ]
   end
+
+  test "modifies a user" do
+    {:ok, old_me} = Enmity.User.get_me()
+
+    {:ok, new_me} = Enmity.User.modify_me(username: "New test username")
+
+    assert new_me[:username] == "New test username"
+
+    {:ok, _resp} = Enmity.User.modify_me(username: old_me[:username])
+  end
 end

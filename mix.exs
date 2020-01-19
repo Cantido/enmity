@@ -27,6 +27,7 @@ defmodule Enmity.MixProject do
 
   defp deps do
     [
+      {:ex_image_info, "~> 0.2.4"},
       {:httpoison, "~> 1.5"},
       {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.21", only: :dev}
