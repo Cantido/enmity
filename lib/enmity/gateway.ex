@@ -59,9 +59,8 @@ defmodule Enmity.Gateway do
         heartbeat_interval_ms = body.d.heartbeat_interval
         Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
 
-        # {_osfamily, osname} = :os.type()
-        # osname = to_string(osname)
-        osname = "windows"
+        {osfamily, osname} = :os.type()
+        osname = "#{osfamily} #{to_string(osname)}"
 
         payload = %{
           "op" => 2,
