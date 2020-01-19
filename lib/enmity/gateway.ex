@@ -32,46 +32,60 @@ defmodule Enmity.Gateway do
   end
 
   def handle_info(:heartbeat, state = %{conn: conn_pid, last_sequence_number: seq, heartbeat_interval_ms: heartbeat_interval_ms}) do
-    :gun.ws_send(conn_pid, Poison.encode!(%{o: 1, d: seq}))
+    :gun.ws_send(conn_pid, {:binary, %{op: 1, d: seq}})
     Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
     {:noreply, state}
   end
 
-  def handle_info({:gun_ws, _ConnPid, _StreamRef, frame}, state = %{conn: conn_pid}) do
-    body = Poison.decode!(frame)
+  def handle_info({:gun_ws, _ConnPid, _StreamRef, {:binary, frame}}, state = %{conn: conn_pid}) do
+    # body = Poison.decode!(frame)
+    body = frame
+    |> :erlang.iolist_to_binary()
+    |> :erlang.binary_to_term()
 
-    Logger.debug("Recieved websocket message #{frame}")
+    Logger.debug("Recieved websocket message #{inspect body}")
 
-    case body["o"] do
+    case body.op do
       # regular message dispatch
       0 ->
-        case body["t"] do
+        case body.t do
           "Ready" -> Logger.debug("Successfully set up a connection!!!!")
           something -> Logger.debug("Got an event I don't recognize: #{something}")
         end
         {:noreply, %{state | connected: true}}
       # hello message
       10 ->
-        heartbeat_interval_ms = body["d"]["heartbeat_interval"]
+        Logger.debug("Got a hello message, sending identifier frame")
+        heartbeat_interval_ms = body.d.heartbeat_interval
         Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
 
-        {_osfamily, osname} = :os.type()
+        # {_osfamily, osname} = :os.type()
+        # osname = to_string(osname)
+        osname = "windows"
 
-        :gun.ws_send(conn_pid, Poison.encode!(%{o: 2, d: %{
-          token: Application.fetch_env!(:enmity, :token),
-          properties: %{
-            "$os": osname,
-            "$browser": "enmity",
-            "$device": "enmity"
+        payload = %{
+          "op" => 2,
+          "t" => "IDENTIFY",
+          "s" => Map.get(state, :last_sequence_number),
+          "d" => %{
+            "token" => Application.fetch_env!(:enmity, :token),
+            "properties" => %{
+              "$os" => osname,
+              "$browser" => "enmity",
+              "$device" => "enmity"
+            }
           }
-        }}))
+        }
+        |> :erlang.term_to_binary()
+
+        :gun.ws_send(conn_pid, {:binary, payload})
         {:noreply, Map.put(state, :heartbeat_interval_ms, heartbeat_interval_ms)}
       # heartbeat ack
       11 ->
         {:noreply, state}
+      _ ->
+        {:noreply, state}
     end
-
-    {:noreply, state}
   end
 
   def handle_info({:gun_upgrade, _conn_pid, _stream_ref, _, _}, state) do
@@ -82,9 +96,11 @@ defmodule Enmity.Gateway do
   def handle_info({:gun_up, conn_pid, _protocol}, state = %{connect_url: url}) do
     Logger.debug("Connection to host successful, upgrading to websocket connection")
     parsed_url = URI.parse(url)
-    :gun.ws_upgrade(conn_pid, to_charlist("#{parsed_url.path}?v=6&encoding=json"))
+    stream_ref = :gun.ws_upgrade(
+      conn_pid,
+      '/?encoding=etf&v=6')
 
-    {:noreply, state}
+    {:noreply, Map.put(state, :stream_ref, stream_ref)}
   end
 
   def handle_info(msg, state) do
