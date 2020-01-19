@@ -49,10 +49,12 @@ defmodule Enmity.Gateway do
       # regular message dispatch
       0 ->
         case body.t do
-          "Ready" -> Logger.debug("Successfully set up a connection!!!!")
+          "READY" ->
+            Logger.debug("Successfully set up a connection!!!!")
+            {:noreply, %{state | connected: true}}
           something -> Logger.debug("Got an event I don't recognize: #{something}")
+            {:noreply, state}
         end
-        {:noreply, %{state | connected: true}}
       # hello message
       10 ->
         Logger.debug("Got a hello message, sending identifier frame")
