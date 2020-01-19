@@ -10,7 +10,7 @@ defmodule Enmity.UserTest do
       bot: true,
       discriminator: "4646",
       id: "625487844994973716",
-      username: "testbot"
+      username: "Rosa's Robot"
     ]
   end
 end
