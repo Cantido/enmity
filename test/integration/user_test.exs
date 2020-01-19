@@ -5,13 +5,13 @@ defmodule Enmity.UserTest do
   test "gets a user" do
     {:ok, resp} = Enmity.User.get("625487844994973716")
 
-    assert resp == [
+    assert resp == %{
       avatar: nil,
       bot: true,
       discriminator: "4646",
       id: "625487844994973716",
       username: "Rosa's Robot"
-    ]
+    }
   end
 
   test "modifies a user" do
@@ -27,13 +27,13 @@ defmodule Enmity.UserTest do
   test "gets guilds" do
     {:ok, guilds} = Enmity.User.my_guilds()
 
-    assert guilds == [[
+    assert guilds == [%{
       icon: nil,
       id: "668217932211421234",
       name: "Rosa's Lab",
       owner: false,
       permissions: 104324673
-    ]]
+    }]
   end
 
   test "get connections" do

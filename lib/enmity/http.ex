@@ -17,7 +17,11 @@ defmodule Enmity.HTTP do
     icon owner_id application_id parent_id last_pin_timestamp
   )
 
-  @expected_fields @user_fields ++ @guild_fields ++ @channel_fields
+  @gateway_fields ~w(
+    url shards session_start_limit total remaining reset_after
+  )
+
+  @expected_fields @user_fields ++ @guild_fields ++ @channel_fields ++ @gateway_fields
 
   @doc """
   Scopes a URL into a Discord bot request.
@@ -72,7 +76,7 @@ defmodule Enmity.HTTP do
   ## Examples
 
       iex> Enmity.HTTP.process_response_body(~s({"username": "testbot"}))
-      [username: "testbot"]
+      %{username: "testbot"}
 
   """
   def process_response_body(body) do
@@ -83,6 +87,15 @@ defmodule Enmity.HTTP do
       Enum.map(body, &sanitize_keys/1)
     else
       sanitize_keys(body)
+      |> update_if_present("session_start_limit", &sanitize_keys/1)
+    end
+  end
+
+  defp update_if_present(map, key, fun) when is_map(map) and is_function(fun) do
+    if Map.has_key?(map, key) do
+      Map.update!(map, key, fun)
+    else
+      map
     end
   end
 
@@ -90,6 +103,7 @@ defmodule Enmity.HTTP do
     map
     |> Map.take(@expected_fields)
     |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
+    |> Map.new()
   end
 
   def make_response_nicer(response) do
