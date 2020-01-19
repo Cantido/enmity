@@ -28,7 +28,10 @@ defmodule Enmity.HTTP do
 
   """
   def process_request_headers(headers) do
-     headers ++ ["Accept": "Application/json; Charset=utf-8"]
+    headers ++ [
+      "Authorization": "Bot #{Application.fetch_env!(:enmity, :token)}",
+      "Accept": "Application/json; Charset=utf-8"
+    ]
   end
 
   @doc """
