@@ -34,6 +34,5 @@ defmodule Enmity.UserTest do
       owner: false,
       permissions: 104324673
     ]]
-
   end
 end
