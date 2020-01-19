@@ -2,10 +2,22 @@ defmodule Enmity.HTTP do
   use HTTPoison.Base
   require Logger
 
-  @expected_fields ~w(
-    avatar bot discriminator email flags id locale mfa_enabled username verified premium_type system
+  @user_fields ~w(
+    avatar bot discriminator email flags id locale mfa_enabled username
+    verified premium_type system
+  )
+
+  @guild_fields ~w(
     name icon owner permissions
   )
+
+  @channel_fields ~w(
+    id type guild_id position permission_overwrites name topic nsfw
+    last_message_id bitrate user_limit rate_limit_per_user recipients
+    icon owner_id application_id parent_id last_pin_timestamp
+  )
+
+  @expected_fields @user_fields ++ @guild_fields ++ @channel_fields
 
   @doc """
   Scopes a URL into a Discord bot request.
