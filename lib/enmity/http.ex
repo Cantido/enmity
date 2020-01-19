@@ -60,4 +60,15 @@ defmodule Enmity.HTTP do
     |> Map.take(@expected_fields)
     |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
   end
+
+  def make_response_nicer(response) do
+    case response do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {:ok, body}
+      {:ok, %HTTPoison.Response{status_code: code, body: body}} ->
+        {:error, [status_code: code, reason: body]}
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        {:error, [reason: reason]}
+    end
+  end
 end
