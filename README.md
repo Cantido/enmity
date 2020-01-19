@@ -41,6 +41,25 @@ assert resp == [
 ]
 ```
 
+### Discord Gateway
+
+To respond to real-time events, use `Enmity.Gateway` and define `handle_event/3` callbacks to receive events from Discord.
+
+```elixir
+defmodule MyGateway do
+  use Enmity.Gateway
+
+  def handle_event(:READY, data, state) do
+    # We're connected! hooray!
+    {:ok, state}
+  end
+
+  def handle_event(:GUILD_CREATE, data, state) do
+    # This event will be sent after :READY, once for each guild your bot is a member of.
+    {:ok, state}
+  end
+end
+```
 ## Testing
 
 Alongside the usual `mix test`, this library also has integration tests.
