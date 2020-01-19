@@ -25,7 +25,15 @@ defmodule Enmity.HTTP do
     url shards session_start_limit total remaining reset_after
   )
 
-  @expected_fields @user_fields ++ @guild_fields ++ @channel_fields ++ @gateway_fields
+  @message_fields ~w(
+    id channel_id guild_id author member content timestamp edited_timestamp tts
+    mention_everyone mentions mention_roles mention_channels attachments embeds
+    reactions nonce pinned webhook_id type activity application
+    message_reference flags
+  )
+
+  @expected_fields @user_fields ++ @guild_fields ++ @channel_fields ++
+                   @gateway_fields ++ @message_fields
 
   @doc """
   Scopes a URL into a Discord bot request.
