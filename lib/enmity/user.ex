@@ -6,7 +6,8 @@ defmodule Enmity.User do
   @doc """
   Gets a user.
   """
-  def get(user_id, [token: token]) do
+  def get(user_id) do
+    token = Application.fetch_env!(:enmity, :token)
     url = "/users/#{user_id}"
     headers = ["Authorization": "Bot #{token}"]
 

@@ -2,10 +2,8 @@ defmodule Enmity.UserTest do
   use ExUnit.Case
   doctest Enmity.User
 
-  @token Application.fetch_env!(:enmity, :token)
-
   test "gets a user" do
-    {:ok, resp} = Enmity.User.get("625487844994973716", token: @token)
+    {:ok, resp} = Enmity.User.get("625487844994973716")
 
     assert resp == [
       avatar: nil,
