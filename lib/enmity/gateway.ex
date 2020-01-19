@@ -73,7 +73,7 @@ defmodule Enmity.Gateway do
           0 ->
             case body.t do
               :READY ->
-                Logger.debug("Successfully set up a connection! data: #{inspect data}")
+                Logger.debug("Successfully set up a connection!")
                 {:ok, new_user_state} = handle_event(:READY, body.d, state.user_state)
                 {:noreply, %{state | connected: true, user_state: new_user_state}}
               event ->
