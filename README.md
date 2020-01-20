@@ -72,6 +72,8 @@ Run the tests by setting the `MIX_ENV` to `integration`:
 MIX_ENV=integration mix test
 ```
 
+https://discordapp.com/oauth2/authorize?client_id=625487844994973716&scope=bot&permissions=8
+
 ## License
 
 Copyright © 2019 Rosa Richter

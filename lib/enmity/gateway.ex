@@ -2,7 +2,7 @@ defmodule Enmity.Gateway do
   @moduledoc """
   Connects to the Discord Gateway.
 
-  Import this module with `Use` and define `handle_event/3` callbacks to receive events from Discord.
+  Import this module with `use` and define `handle_event/3` callbacks to receive events from Discord.
 
       defmodule MyGateway do
         use Enmity.Gateway
@@ -17,6 +17,9 @@ defmodule Enmity.Gateway do
           {:ok, state}
         end
       end
+
+  Event names are tokens in all-caps.
+  See [Discord's full list of events](https://discordapp.com/developers/docs/topics/gateway#commands-and-events).
   """
 
 
@@ -34,7 +37,11 @@ defmodule Enmity.Gateway do
       end
 
       def init(:ok) do
-        {:ok, %{connected: false, user_state: %{}}, 0}
+        {:ok, %{
+          connected: false,
+          last_sequence_number: nil,
+          user_state: %{}
+        }, 0}
       end
 
       def handle_call(:is_connected, _from, state = %{connected: connected}) do
@@ -49,7 +56,6 @@ defmodule Enmity.Gateway do
         state = state
         |> Map.put(:connect_url, url)
         |> Map.put(:conn, conn_pid)
-        |> Map.put(:last_sequence_number, nil)
 
         {:noreply, state}
       end
@@ -75,10 +81,10 @@ defmodule Enmity.Gateway do
               :READY ->
                 Logger.debug("Successfully set up a connection!")
                 {:ok, new_user_state} = handle_event(:READY, body.d, state.user_state)
-                {:noreply, %{state | connected: true, user_state: new_user_state}}
+                {:noreply, %{state | connected: true, user_state: new_user_state, last_sequence_number: body.s}}
               event ->
                 {:ok, new_user_state} = handle_event(event, body.d, state.user_state)
-                {:noreply, %{state | user_state: new_user_state}}
+                {:noreply, %{state | user_state: new_user_state, last_sequence_number: body.s}}
             end
           # hello message
           10 ->
