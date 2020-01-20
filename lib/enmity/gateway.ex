@@ -61,6 +61,7 @@ defmodule Enmity.Gateway do
       end
 
       def handle_info(:heartbeat, state = %{conn: conn_pid, last_sequence_number: seq, heartbeat_interval_ms: heartbeat_interval_ms}) do
+        Logger.debug("Sending heartbeat message")
         :gun.ws_send(conn_pid, {:binary, %{"op" => 1, "d" => seq, "t" => "HEARTBEAT"}})
         Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
         {:noreply, state}
