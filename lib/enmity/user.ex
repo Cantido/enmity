@@ -8,7 +8,7 @@ defmodule Enmity.User do
   Gets a user.
   """
   def get(user_id) do
-    HTTP.get("/users/#{user_id}") |> HTTP.make_response_nicer()
+    HTTP.get("/users/#{user_id}")
   end
 
   @doc """
@@ -46,7 +46,7 @@ defmodule Enmity.User do
       args
     end
 
-    HTTP.patch("/users/@me", Poison.encode!(args)) |> HTTP.make_response_nicer()
+    HTTP.patch("/users/@me", Poison.encode!(args))
   end
 
   defp convert_to_data_uri!(image) when is_binary(image) do
@@ -69,21 +69,21 @@ defmodule Enmity.User do
   Get all the current user's guilds (called "servers" on the frontend)
   """
   def my_guilds do
-    HTTP.get("/users/@me/guilds") |> HTTP.make_response_nicer()
+    HTTP.get("/users/@me/guilds")
   end
 
   @doc """
   Leave a guild.
   """
   def leave_guild(guild_id) do
-    HTTP.delete("/users/@me/guilds/#{guild_id}") |> HTTP.make_response_nicer()
+    HTTP.delete("/users/@me/guilds/#{guild_id}")
   end
 
   @doc """
   Create a direct message with the given recipient.
   """
   def create_dm(recipient_id) do
-    HTTP.post("/users/@me/channels", Poison.encode!(recipient_id)) |> HTTP.make_response_nicer()
+    HTTP.post("/users/@me/channels", Poison.encode!(recipient_id))
   end
 
   @doc """
@@ -93,13 +93,12 @@ defmodule Enmity.User do
   """
   def create_group_dm(tokens, nicks) when is_list(tokens) and is_map(nicks) do
     HTTP.post("/users/@me/channels", Poison.encode!(%{tokens: tokens, nicks: nicks}))
-    |> HTTP.make_response_nicer()
   end
 
   @doc """
   Get all of the current user's Facebook, Twitch, Twitter, etc. connections.
   """
   def my_connections do
-    HTTP.get("/users/@me/connections") |> HTTP.make_response_nicer()
+    HTTP.get("/users/@me/connections")
   end
 end

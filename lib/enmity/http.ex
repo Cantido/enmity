@@ -32,8 +32,10 @@ defmodule Enmity.HTTP do
     message_reference flags
   )
 
+  @rate_limited_fields ~w(message retry_after global)
+
   @expected_fields @user_fields ++ @guild_fields ++ @channel_fields ++
-                   @gateway_fields ++ @message_fields
+                   @gateway_fields ++ @message_fields ++ @rate_limited_fields
 
   @doc """
   Scopes a URL into a Discord bot request.
@@ -57,14 +59,16 @@ defmodule Enmity.HTTP do
       [
         "Authorization": "Bot A gigantic fifty-nine character string 12345678901234567890",
         "Accept": "Application/json; Charset=utf-8",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-RateLimit-Precision": "second"
       ]
   """
   def process_request_headers(headers) do
     headers ++ [
       "Authorization": "Bot #{Application.fetch_env!(:enmity, :token)}",
       "Accept": "Application/json; Charset=utf-8",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-RateLimit-Precision": "second"
     ]
   end
 
@@ -103,6 +107,14 @@ defmodule Enmity.HTTP do
     end
   end
 
+  def process_response(%HTTPoison.Response{status_code: 200, body: body}) do
+    body
+  end
+
+  def process_response(%HTTPoison.Error{reason: reason}) do
+    reason
+  end
+
   defp update_if_present(map, key, fun) when is_map(map) and is_function(fun) do
     if Map.has_key?(map, key) do
       Map.update!(map, key, fun)
@@ -116,16 +128,5 @@ defmodule Enmity.HTTP do
     |> Map.take(@expected_fields)
     |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
     |> Map.new()
-  end
-
-  def make_response_nicer(response) do
-    case response do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, body}
-      {:ok, %HTTPoison.Response{status_code: code, body: body}} ->
-        {:error, [status_code: code, reason: body]}
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:error, [reason: reason]}
-    end
   end
 end
