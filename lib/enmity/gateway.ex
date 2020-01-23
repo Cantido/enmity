@@ -47,44 +47,42 @@ defmodule Enmity.Gateway do
         {:noreply, state}
       end
 
-      def handle_operation(body, state = %{conn: conn_pid}) do
-        case body.op do
-          # regular message dispatch
-          0 ->
-            event = body.t
-
-            state = if event == :READY do
-              Logger.debug("Successfully set up a connection!")
-              %{state | connected: true}
-            else
-              state
-            end
-
-            handle_event(event, body.d, state.user_state)
-            |> case do
-              {:ok, new_user_state} -> {:noreply, %{state | user_state: new_user_state, last_sequence_number: body.s}}
-              {:error, reason} -> {:stop, reason, state}
-            end
-
-          # hello message
-          10 ->
-            Logger.debug("Got a hello message, sending identifier frame")
-            heartbeat_interval_ms = body.d.heartbeat_interval
-            Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
-
-            payload =
-              state
-              |> Map.get(:last_sequence_number)
-              |> Operations.identify()
-
-            Websocket.send(conn_pid, payload)
-            {:noreply, Map.put(state, :heartbeat_interval_ms, heartbeat_interval_ms)}
-          # heartbeat ack
-          11 ->
-            {:noreply, state}
-          _ ->
-            {:noreply, state}
+      def handle_operation(body = %{op: 0, t: event}, state) do
+        state = if event == :READY do
+          Logger.debug("Successfully set up a connection!")
+          %{state | connected: true}
+        else
+          state
         end
+
+        handle_event(event, body.d, state.user_state)
+        |> case do
+          {:ok, new_user_state} -> {:noreply, %{state | user_state: new_user_state, last_sequence_number: body.s}}
+          {:error, reason} -> {:stop, reason, state}
+        end
+      end
+
+      def handle_operation(body = %{op: 10}, state = %{conn: conn_pid}) do
+        Logger.debug("Got a hello message, sending identifier frame")
+        heartbeat_interval_ms = body.d.heartbeat_interval
+        Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
+
+        payload =
+          state
+          |> Map.get(:last_sequence_number)
+          |> Operations.identify()
+
+        Websocket.send(conn_pid, payload)
+        {:noreply, Map.put(state, :heartbeat_interval_ms, heartbeat_interval_ms)}
+      end
+
+      def handle_operation(body = %{op: 11}, state) do
+        {:noreply, state}
+      end
+
+      def handle_operation(body, state) do
+        Logger.debug("Not a handled operation: #{inspect body}")
+        {:noreply, state}
       end
 
       def handle_event(_, _, state) do
