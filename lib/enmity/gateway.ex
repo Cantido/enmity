@@ -141,6 +141,10 @@ defmodule Enmity.Gateway do
         {:noreply, state}
       end
 
+      def handle_event(_, _, state) do
+        {:ok, state}
+      end
+
       def terminate(reason, state) do
         if Map.has_key?(state, :conn_pid) do
           :gun.shutdown(state.conn_pid)
