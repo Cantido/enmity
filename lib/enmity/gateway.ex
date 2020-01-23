@@ -49,7 +49,7 @@ defmodule Enmity.Gateway do
       end
 
       def handle_info(:timeout, state) do
-        {:ok, %{url: url}} = Enmity.HTTP.get("/gateway/bot") |> Enmity.HTTP.make_response_nicer()
+        {:ok, %{url: url}} = Enmity.HTTP.get("/gateway/bot")
         parsed_url = URI.parse(url)
         {:ok, conn_pid} = :gun.open(to_charlist(parsed_url.host), 443, %{protocols: [:http]})
 
