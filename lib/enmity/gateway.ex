@@ -140,6 +140,12 @@ defmodule Enmity.Gateway do
         Logger.debug("Got an unrecognized message: #{inspect msg}")
         {:noreply, state}
       end
+
+      def terminate(reason, state) do
+        if Map.has_key?(state, :conn_pid) do
+          :gun.shutdown(state.conn_pid)
+        end
+      end
     end
   end
 
