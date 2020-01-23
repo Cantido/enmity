@@ -73,7 +73,6 @@ defmodule Enmity.Gateway do
       end
 
       def handle_info({:gun_ws, _ConnPid, _StreamRef, {:binary, frame}}, state = %{conn: conn_pid}) do
-        # body = Poison.decode!(frame)
         body = frame
         |> :erlang.iolist_to_binary()
         |> :erlang.binary_to_term()
