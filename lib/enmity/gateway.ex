@@ -26,6 +26,8 @@ defmodule Enmity.Gateway do
   defmacro __using__(_opts) do
     quote do
       use GenServer
+      alias Enmity.Gateway.Operations
+      alias Enmity.Gateway
       require Logger
 
       def start_link(_args) do
@@ -67,55 +69,42 @@ defmodule Enmity.Gateway do
 
       def handle_info(:heartbeat, state = %{conn: conn_pid, last_sequence_number: seq, heartbeat_interval_ms: heartbeat_interval_ms}) do
         Logger.debug("Sending heartbeat message")
-        :gun.ws_send(conn_pid, {:binary, %{"op" => 1, "d" => seq, "t" => "HEARTBEAT"}})
+        Gateway.send(conn_pid, Operations.heartbeat(seq))
         Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
         {:noreply, state}
       end
 
       def handle_info({:gun_ws, _ConnPid, _StreamRef, {:binary, frame}}, state = %{conn: conn_pid}) do
-        body = frame
-        |> :erlang.iolist_to_binary()
-        |> :erlang.binary_to_term()
+        body = Gateway.decode_frame(frame)
 
         Logger.debug("Recieved websocket message #{inspect body}")
 
         case body.op do
           # regular message dispatch
           0 ->
-            case body.t do
-              :READY ->
-                Logger.debug("Successfully set up a connection!")
-                {:ok, new_user_state} = handle_event(:READY, body.d, state.user_state)
-                {:noreply, %{state | connected: true, user_state: new_user_state, last_sequence_number: body.s}}
-              event ->
-                {:ok, new_user_state} = handle_event(event, body.d, state.user_state)
-                {:noreply, %{state | user_state: new_user_state, last_sequence_number: body.s}}
+            event = body.t
+
+            state = if event == :READY do
+              Logger.debug("Successfully set up a connection!")
+              %{state | connected: true}
+            else
+              state
             end
+
+            {:ok, new_user_state} = handle_event(event, body.d, state.user_state)
+            {:noreply, %{state | user_state: new_user_state, last_sequence_number: body.s}}
           # hello message
           10 ->
             Logger.debug("Got a hello message, sending identifier frame")
             heartbeat_interval_ms = body.d.heartbeat_interval
             Process.send_after(self(), :heartbeat, heartbeat_interval_ms)
 
-            {osfamily, osname} = :os.type()
-            osname = "#{osfamily} #{to_string(osname)}"
+            payload =
+              state
+              |> Map.get(:last_sequence_number)
+              |> Operations.identify()
 
-            payload = %{
-              "op" => 2,
-              "t" => "IDENTIFY",
-              "s" => Map.get(state, :last_sequence_number),
-              "d" => %{
-                "token" => Application.fetch_env!(:enmity, :token),
-                "properties" => %{
-                  "$os" => osname,
-                  "$browser" => "enmity",
-                  "$device" => "enmity"
-                }
-              }
-            }
-            |> :erlang.term_to_binary()
-
-            :gun.ws_send(conn_pid, {:binary, payload})
+            Gateway.send(conn_pid, payload)
             {:noreply, Map.put(state, :heartbeat_interval_ms, heartbeat_interval_ms)}
           # heartbeat ack
           11 ->
@@ -162,4 +151,15 @@ defmodule Enmity.Gateway do
       end
   """
   @callback handle_event(term(), term(), term()) :: {:ok, term()}
+
+  def decode_frame(frame) do
+    frame
+    |> :erlang.iolist_to_binary()
+    |> :erlang.binary_to_term()
+  end
+
+  def send(conn_pid, payload) do
+    payload = :erlang.term_to_binary(payload)
+    :gun.ws_send(conn_pid, {:binary, payload})
+  end
 end
