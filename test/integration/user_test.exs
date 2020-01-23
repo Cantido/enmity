@@ -34,7 +34,7 @@ defmodule Enmity.UserTest do
       id: "668217932211421234",
       name: "Rosa's Lab",
       owner: false,
-      permissions: 104324673
+      permissions: 2147483647
     }]
   end
 
