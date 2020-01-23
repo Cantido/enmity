@@ -7,6 +7,7 @@ defmodule Enmity.MixProject do
       version: "0.3.0",
       description: "A Discord library.",
       elixir: "~> 1.9",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
@@ -14,6 +15,10 @@ defmodule Enmity.MixProject do
       test_paths: test_paths(Mix.env())
     ]
   end
+
+  defp elixirc_paths(:test), do: ["test/unit/support", "lib"]
+  defp elixirc_paths(:integration), do: ["test/integration/support", "lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp test_paths(:integration), do: ["test/integration"]
   defp test_paths(_), do: ["test/unit"]
