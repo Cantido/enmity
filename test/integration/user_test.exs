@@ -14,15 +14,17 @@ defmodule Enmity.UserTest do
     }
   end
 
-  test "modifies a user" do
-    {:ok, old_me} = Enmity.User.get_me()
-
-    {:ok, new_me} = Enmity.User.modify_me(username: "New test username")
-
-    assert new_me[:username] == "New test username"
-
-    {:ok, _resp} = Enmity.User.modify_me(username: old_me[:username])
-  end
+  # Commented out because name-changes are very rate-limited
+  #
+  # test "modifies a user" do
+  #   {:ok, old_me} = Enmity.User.get_me()
+  #
+  #   {:ok, new_me} = Enmity.User.modify_me(username: "New test username")
+  #
+  #   assert new_me[:username] == "New test username"
+  #
+  #   {:ok, _resp} = Enmity.User.modify_me(username: old_me[:username])
+  # end
 
   test "gets guilds" do
     {:ok, guilds} = Enmity.User.my_guilds()
