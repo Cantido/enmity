@@ -52,10 +52,15 @@ defmodule Enmity.Gateway do
         {:ok, %{url: url}} = Enmity.HTTP.get("/gateway/bot")
         parsed_url = URI.parse(url)
         {:ok, conn_pid} = :gun.open(to_charlist(parsed_url.host), 443, %{protocols: [:http]})
+        {:ok, :http} = :gun.await_up(conn_pid)
+
+        stream_ref = :gun.ws_upgrade(
+          conn_pid,
+          '/?encoding=etf&v=6')
 
         state = state
-        |> Map.put(:connect_url, url)
         |> Map.put(:conn, conn_pid)
+        |> Map.put(:stream_ref, stream_ref)
 
         {:noreply, state}
       end
@@ -124,16 +129,6 @@ defmodule Enmity.Gateway do
       def handle_info({:gun_upgrade, _conn_pid, _stream_ref, _, _}, state) do
         Logger.debug("Successfully upgraded to a websocket connection")
         {:noreply, state}
-      end
-
-      def handle_info({:gun_up, conn_pid, _protocol}, state = %{connect_url: url}) do
-        Logger.debug("Connection to host successful, upgrading to websocket connection")
-        parsed_url = URI.parse(url)
-        stream_ref = :gun.ws_upgrade(
-          conn_pid,
-          '/?encoding=etf&v=6')
-
-        {:noreply, Map.put(state, :stream_ref, stream_ref)}
       end
 
       def handle_info(msg, state) do
