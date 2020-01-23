@@ -91,8 +91,12 @@ defmodule Enmity.Gateway do
               state
             end
 
-            {:ok, new_user_state} = handle_event(event, body.d, state.user_state)
-            {:noreply, %{state | user_state: new_user_state, last_sequence_number: body.s}}
+            handle_event(event, body.d, state.user_state)
+            |> case do
+              {:ok, new_user_state} -> {:noreply, %{state | user_state: new_user_state, last_sequence_number: body.s}}
+              {:error, reason} -> {:stop, reason, state}
+            end
+
           # hello message
           10 ->
             Logger.debug("Got a hello message, sending identifier frame")
@@ -140,6 +144,9 @@ defmodule Enmity.Gateway do
   Handle a Discord Gateway event.
 
   Event names are tokens in all-caps, like `:READY`.
+
+  Return an `{:ok, state}` tuple on success.
+  If you return an `{:error, reason}` tuple, the process will terminate with your given reason.
 
   For a full list of events, see [Discord's docs on Gateway events](https://discordapp.com/developers/docs/topics/gateway#commands-and-events-gateway-events).
 
