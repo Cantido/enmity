@@ -74,35 +74,11 @@ defmodule Enmity.Gateway do
         {:noreply, state}
       end
 
-      def handle_info({:gun_ws, _ConnPid, _StreamRef, {:binary, frame}}, state) do
+      def handle_info({:gun_ws, _ConnPid, _StreamRef, {:binary, frame}}, state = %{conn: conn_pid}) do
         body = Gateway.decode_frame(frame)
 
         Logger.debug("Recieved websocket message #{inspect body}")
 
-        handle_operation(body, state)
-      end
-
-      def handle_info({:gun_upgrade, _conn_pid, _stream_ref, _, _}, state) do
-        Logger.debug("Successfully upgraded to a websocket connection")
-        {:noreply, state}
-      end
-
-      def handle_info(msg, state) do
-        Logger.debug("Got an unrecognized message: #{inspect msg}")
-        {:noreply, state}
-      end
-
-      def handle_event(_, _, state) do
-        {:ok, state}
-      end
-
-      def terminate(reason, state) do
-        if Map.has_key?(state, :conn_pid) do
-          :gun.shutdown(state.conn_pid)
-        end
-      end
-
-      def handle_operation(body, state = %{conn: conn_pid}) do
         case body.op do
           # regular message dispatch
           0 ->
@@ -139,6 +115,26 @@ defmodule Enmity.Gateway do
             {:noreply, state}
           _ ->
             {:noreply, state}
+        end
+      end
+
+      def handle_info({:gun_upgrade, _conn_pid, _stream_ref, _, _}, state) do
+        Logger.debug("Successfully upgraded to a websocket connection")
+        {:noreply, state}
+      end
+
+      def handle_info(msg, state) do
+        Logger.debug("Got an unrecognized message: #{inspect msg}")
+        {:noreply, state}
+      end
+
+      def handle_event(_, _, state) do
+        {:ok, state}
+      end
+
+      def terminate(reason, state) do
+        if Map.has_key?(state, :conn_pid) do
+          :gun.shutdown(state.conn_pid)
         end
       end
     end
