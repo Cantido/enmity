@@ -42,7 +42,7 @@ defmodule Enmity.HTTP do
 
   ## Examples
 
-      iex> Enmity.HTTP.process_request_url("/users/@me")
+      Enmity.HTTP.process_request_url("/users/@me")
       "https://discordapp.com/api/users/@me"
 
   """
@@ -55,7 +55,7 @@ defmodule Enmity.HTTP do
 
   ## Examples
 
-      iex> Enmity.HTTP.process_request_headers([])
+      Enmity.HTTP.process_request_headers([])
       [
         "Authorization": "Bot A gigantic fifty-nine character string 12345678901234567890",
         "Accept": "Application/json; Charset=utf-8",
@@ -91,7 +91,7 @@ defmodule Enmity.HTTP do
 
   ## Examples
 
-      iex> Enmity.HTTP.process_response_body(~s({"username": "testbot"}))
+      Enmity.HTTP.process_response_body(~s({"username": "testbot"}))
       %{username: "testbot"}
 
   """
